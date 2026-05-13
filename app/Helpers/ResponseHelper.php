@@ -1,23 +1,28 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Helpers;
 
-class ResponseHelper{
-    static function success($message = "تمت العملية بنجاح" , $data=null , $code = 200){
-        return [
+use Illuminate\Http\JsonResponse;
+
+class ResponseHelper
+{
+    static function success(string $message = "تمت العملية بنجاح", mixed $data = null, int $code = 200): JsonResponse
+    {
+        return response()->json([
             'success' => true,
             'message' => $message,
             'data' => $data,
             'code' => $code
-        ];
-
+        ], $code);
     }
-    static function fail($message = " فشلت العملية " , $data=null , $code = 400){
-        return [
+    static function fail(string $message = " فشلت العملية ", mixed $data = null, int $code = 400): JsonResponse
+    {
+        return response()->json([
             'success' => false,
             'message' => $message,
             'data' => $data,
             'code' => $code
-        ];
+        ], $code);
     }
 }
