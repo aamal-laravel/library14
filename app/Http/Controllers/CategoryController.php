@@ -35,13 +35,13 @@ class CategoryController extends Controller
 
     function update(Request $request , Category $category):JsonResponse{
         $request->validate([
-            'name' => "required|max:50|unique:categoriesx,name,$category->id"
+            'name' => "required|max:50|unique:categories,name,$category->id"
         ]);
         // $category = Category::findOrFail($id);
          $category->name = $request->name;
         $category->description = $request->description;
         $category->save();  
-       return ResponseHelper::success("  تم تعديل السجل بنجاح " , $category , 201);
+       return ResponseHelper::success("  تم تعديل السجل بنجاح " , $category );
     }
 
     function destroy(Category $category):JsonResponse{
