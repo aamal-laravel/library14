@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\ResponseHelper;
 use App\Http\Requests\BookRequest;
 use App\Models\Book;
 
@@ -15,7 +14,7 @@ class BookController extends Controller
     public function index()
     {
         $books = Book::all();
-        return ResponseHelper::success("All books");
+        return apiSuccess("All books");
     }
 
  
@@ -29,7 +28,7 @@ class BookController extends Controller
         Book::create(
             $request->all()
         );
-        return ResponseHelper::success(code: 200);
+        return apiSuccess(code: 200);
     }
 
     /**

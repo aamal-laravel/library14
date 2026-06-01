@@ -2,9 +2,14 @@
 
 namespace App\Http\Requests;
 
+use App\Helpers\ResponseHelper;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
+use Override;
 
 class BookRequest extends FormRequest
 {
@@ -34,16 +39,34 @@ class BookRequest extends FormRequest
             'rental_price' => 'nullable|decimal:0,2',
             'deposit' => 'nullable|decimal:0,2',
 
-            'pages' => 'nullable|integer',
-            'default_borrow_days' => 'nullable|integer|decimal:2',
+            'pages' => 'nullable|integer|min:0',
+            'default_borrow_days' => 'nullable|integer|min:0',
 
             'total_copies' => 'nullable|integer',
             'stock' => 'nullable|integer',
 
             'published_at' => 'nullable|date',
-            'cover' => 'nullable|image|max:2000',
+            'cover' => 'nullable|image|max:2000', //size in kByte
 
             'category_id' => 'required|exists:categories,id'
         ];
+    }
+
+    #[Override]
+    function messages()
+    {
+        return [
+            'ISBN.unique' => 'رقم مكرر',
+        ];
+    }
+    
+    #[Override]
+    function failedValidation(Validator $validator)
+    {      
+        throw new HttpResponseException(
+            apiFail("المدخلات غير صحيحة" ,
+            $validator->errors() , 
+            Response::HTTP_UNPROCESSABLE_ENTITY)
+        );
     }
 }
