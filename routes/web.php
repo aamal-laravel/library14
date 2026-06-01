@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Book;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
@@ -30,4 +31,15 @@ Route::get('route-parameter/{name}', function (Request $request) {
 Route::get('helpers', function (Request $request) {
    // return  new Response("test");
    return response("test"); //using helper function
+});
+/**relation */
+Route::get('1-m-child/{id}', function ($id) {
+   $category = Category::find($id);
+   $books = $category->books;
+   return $books;
+});
+Route::get('1-m-parent/{id}', function ($id) {
+   $book = Book::find($id);
+   $category =  $book->category;
+   return $category;
 });

@@ -14,19 +14,20 @@ class BookController extends Controller
     public function index()
     {
         $books = Book::all();
-        return apiSuccess("All books");
+        return apiSuccess("All books" , $books);
     }
 
- 
+
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(BookRequest $request)
     {
-    //    return $request->all();
+        //    return $request->all();
+        $data = $request->validated();
         Book::create(
-            $request->all()
+            $data
         );
         return apiSuccess(code: 200);
     }
@@ -39,7 +40,7 @@ class BookController extends Controller
         //
     }
 
-   
+
 
     /**
      * Update the specified resource in storage.

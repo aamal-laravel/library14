@@ -21,7 +21,7 @@ class CategoryController extends Controller
     }
     
     function store(Request $request): JsonResponse{
-        $request->validate([
+         $request->validate([
             'name' => 'required|max:50|unique:categories'
         ]);
         // return $request;
@@ -45,6 +45,8 @@ class CategoryController extends Controller
 
     function destroy(Category $category):JsonResponse{
         // $category = Category::findOrFail($id);
+        if ( $category->books->count())
+            return apiFail("لا يمكن محي صنف يتضمن كتب");
         $category->delete();
        return apiSuccess("  تم حذف السجل بنجاح " );
     }

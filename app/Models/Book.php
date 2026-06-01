@@ -11,7 +11,11 @@ class Book extends Model
     use HasFactory;
 
 
-     
+     public $guarded = [];
     
-    public $fillable = ['ISBN', 'title','rental_price', 'deposit','pages','default_borrow_days', 'total_copies','stock','published_at','cover','category_id'];
+    // public $fillable = ['ISBN', 'title','rental_price', 'deposit','pages','default_borrow_days', 'total_copies','stock','published_at','cover','category_id'];
+
+    function category(){
+        return $this->belongsTo(Category::class );
+    }
 }
