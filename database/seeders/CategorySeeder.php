@@ -2,23 +2,52 @@
 
 namespace Database\Seeders;
 
-use App\Models\Category;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Category;
 
 class CategorySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $categories = [
-            ['name' => 'sport' , 'description' => 'الرياضة والصحة الرياضية'],
-            ['name' => 'web' , 'description' => 'كتب تصميم مواقع'],
-            ['name' => 'food' , 'description' => ''],
-            ['name' => 'Medical' , 'description' => ''],
+
+            [
+                'name' => 'الأدب',
+                'description' => 'الروايات والقصص والنصوص الأدبية والشعر'
+            ],
+
+            [
+                'name' => 'التاريخ',
+                'description' => 'كتب التاريخ والحضارات والأحداث التاريخية'
+            ],
+
+            [
+                'name' => 'الدين',
+                'description' => 'العلوم الشرعية والفقه والسيرة'
+            ],
+
+            [
+                'name' => 'الفلسفة',
+                'description' => 'الفكر والفلسفة والمنطق'
+            ],
+
+            [
+                'name' => 'علوم الحاسوب',
+                'description' => 'البرمجة وقواعد البيانات والشبكات'
+            ],
+
+            [
+                'name' => 'الإدارة والأعمال',
+                'description' => 'الإدارة والتسويق والاقتصاد'
+            ],
+
+            [
+                'name' => 'العلوم',
+                'description' => 'الفيزياء والكيمياء والأحياء والرياضيات'
+            ],
+
         ];
+
         Category::insert($categories);
     }
 }
