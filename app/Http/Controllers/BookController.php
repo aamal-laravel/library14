@@ -29,7 +29,7 @@ class BookController extends Controller
         Book::create(
             $data
         );
-        return apiSuccess(code: 200);
+        return apiSuccess(code: 201);
     }
 
     /**
