@@ -26,10 +26,15 @@ class BookController extends Controller
     {
         //    return $request->all();
         $data = $request->validated();
-        Book::create(
+        if ($request->hasFile('cover')){
+            $filename = "$request->ISBN." .  $request->file('cover')->extension();
+            $request->file('cover')->storeAs('book-images' , $filename);
+            $data['cover'] = $filename;
+        }
+        $book = Book::create(
             $data
         );
-        return apiSuccess(code: 201);
+        return apiSuccess(data: $book ,code: 201);
     }
 
     /**
@@ -37,7 +42,6 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        //
     }
 
 

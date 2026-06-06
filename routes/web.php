@@ -43,3 +43,16 @@ Route::get('1-m-parent/{id}', function ($id) {
    $category =  $book->category;
    return $category;
 });
+
+/** env- config */
+Route::get('env', function () {
+   return env('APP_NAME' , 'not found');
+});
+Route::get('config', function () {
+   return config('app.name' , 'not found');
+});
+
+/** file  system */
+Route::get('file-system', function () {
+   return storage_path('app');
+});
