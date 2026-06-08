@@ -9,8 +9,12 @@ use Illuminate\Http\Request;
 class CategoryController extends Controller
 {
 
-    function index(): JsonResponse{
-       $categories =  Category::all();
+    function index(Request $request): JsonResponse{
+        $name = $request->name;
+            
+       $categories =  Category::when($name , function($q , $name) {
+            $q->where('name' , 'like' , "%$name%");
+       })->withCount('books')->get();
        
        return apiSuccess("كافة الأصناف" , $categories );
     }
@@ -45,7 +49,7 @@ class CategoryController extends Controller
 
     function destroy(Category $category):JsonResponse{
         // $category = Category::findOrFail($id);
-        if ( $category->books->count())
+        if ( $category->books()->count())
             return apiFail("لا يمكن محي صنف يتضمن كتب");
         $category->delete();
        return apiSuccess("  تم حذف السجل بنجاح " );

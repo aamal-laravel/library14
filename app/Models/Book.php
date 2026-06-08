@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Book extends Model
 {
@@ -15,7 +16,7 @@ class Book extends Model
     
     // public $fillable = ['ISBN', 'title','rental_price', 'deposit','pages','default_borrow_days', 'total_copies','stock','published_at','cover','category_id'];
 
-    function category(){
+    function category() : BelongsTo{
         return $this->belongsTo(Category::class );
     }
 }
