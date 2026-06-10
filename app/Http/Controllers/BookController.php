@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\BookRequest;
+use App\Http\Resources\BookResource;
 use App\Models\Book;
 
 
@@ -13,7 +14,9 @@ class BookController extends Controller
      */
     public function index()
     {
-        $books = Book::with('category:id,name')->get();
+        $books = Book::get(7);
+        // return $books;  
+        $books = BookResource::collection($books);
         return apiSuccess("All books" , $books);
     }
 
@@ -43,6 +46,7 @@ class BookController extends Controller
     public function show(Book $book)
     {
         $book = $book->load('category');
+        $book = new BookResource( $book);
         return apiSuccess(data: $book);
     }
 

@@ -87,7 +87,16 @@ Route::get('file-system', function () {
 
 /** model-2 */
 Route::get('raw-select', function () {
-   $books = Book::select("rental_price as price" , "deposit", DB::raw('rental_price + deposit as total' ))->get();
+   $books = Book::select("rental_price as price", "deposit", DB::raw('rental_price + deposit as total'))->get();
    return $books;
 });
 
+/** collection */
+Route::get('collect', function () {
+   $array = [
+      ['id' => 1, 'name' => 'Ali'],
+      ['id' => 2, 'name' => 'Sara'],
+   ];
+   $users = collect($array);
+   return   $users->max('id');
+});
