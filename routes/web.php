@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Author;
 use App\Models\Book;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -99,4 +100,16 @@ Route::get('collect', function () {
    ];
    $users = collect($array);
    return   $users->max('id');
+});
+
+
+Route::get("m-m/{id}",function($id){
+  $book= Book::find($id);
+  return $book->author;
+
+});
+Route::get("m-m-2/{id}",function($id){
+  $author= Author::find($id);
+  return $author->books;
+
 });

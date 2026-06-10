@@ -47,7 +47,10 @@ class BookRequest extends FormRequest
             'published_at' => 'nullable|date',
             'cover' => 'nullable|image|max:2000', //size in kByte
 
-            'category_id' => 'required|exists:categories,id'
+            'category_id' => 'required|exists:categories,id',
+
+            'authors' => 'nullable|array',
+            'authors.*' => 'exists:authors,id',
         ];
     }
 

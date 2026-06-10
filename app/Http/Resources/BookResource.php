@@ -18,6 +18,7 @@ class BookResource extends JsonResource
             'title' => $this->title,
             /** add key when key exist for avoid lazy loading */
             'category_name' => $this->whenLoaded('category', fn() =>  $this->category->name) ,
+            'authors' =>  $this->whenLoaded('authors' , fn() => $this->authors),
             /** add a bunch of keys based on creteria  */
             $this->mergeWhen(1==2 , [
                 'created_at' => $this->created_at,

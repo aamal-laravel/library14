@@ -14,7 +14,7 @@ class BookController extends Controller
      */
     public function index()
     {
-        $books = Book::get(7);
+        $books = Book::with('category' ,  'authors')->get();
         // return $books;  
         $books = BookResource::collection($books);
         return apiSuccess("All books" , $books);
@@ -34,9 +34,14 @@ class BookController extends Controller
             $request->file('cover')->storeAs('book-images' , $filename);
             $data['cover'] = $filename;
         }
+       
         $book = Book::create(
             $data
         );
+
+         if ($request->has('authors')){
+            $book->authors()->attach($request->authors);
+        }
         return apiSuccess(data: $book ,code: 201);
     }
 
@@ -45,7 +50,7 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        $book = $book->load('category');
+        $book = $book->load('category' , 'authors');
         $book = new BookResource( $book);
         return apiSuccess(data: $book);
     }
