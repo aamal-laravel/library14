@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BookRequest;
 use App\Http\Resources\BookResource;
 use App\Models\Book;
-
+use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
@@ -14,10 +14,10 @@ class BookController extends Controller
      */
     public function index()
     {
-        $books = Book::with('category' ,  'authors')->get();
+        $books = Book::with('category',  'authors')->get();
         // return $books;  
         $books = BookResource::collection($books);
-        return apiSuccess("All books" , $books);
+        return apiSuccess("All books", $books);
     }
 
 
@@ -27,22 +27,22 @@ class BookController extends Controller
      */
     public function store(BookRequest $request)
     {
-        //    return $request->all();
+        //    return $request->all()ook;
         $data = $request->validated();
-        if ($request->hasFile('cover')){
+        if ($request->hasFile('cover')) {
             $filename = "$request->ISBN." .  $request->file('cover')->extension();
-            $request->file('cover')->storeAs('book-images' , $filename);
+            $request->file('cover')->storeAs('book-images', $filename);
             $data['cover'] = $filename;
         }
-       
+
         $book = Book::create(
             $data
         );
 
-         if ($request->has('authors')){
+        if ($request->has('authors')) {
             $book->authors()->attach($request->authors);
         }
-        return apiSuccess(data: $book ,code: 201);
+        return apiSuccess(data: $book, code: 201);
     }
 
     /**
@@ -50,8 +50,8 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        $book = $book->load('category' , 'authors');
-        $book = new BookResource( $book);
+        $book = $book->load('category', 'authors');
+        $book = new BookResource($book);
         return apiSuccess(data: $book);
     }
 
@@ -62,7 +62,21 @@ class BookController extends Controller
      */
     public function update(BookRequest $request, Book $book)
     {
-        //
+        $data = $request->validated();
+        if ($request->hasfile('cover')) {
+            if ($book->cover)
+                Storage::delete("book-images/$book->cover");
+            $filename = "$request->ISBN." .  $request->file('cover')->extension();
+            $request->file('cover')->storeAs('book-images', $filename);
+            $data['cover'] = $filename;
+        }
+        $book->update($data);
+        if ($request->has('authors')){
+            // $book->authors()->detach($book->authors);
+            // $book->authors()->attach($request->authors);
+            $book->authors()->sync($request->authors);
+        }
+        return apiSuccess('book updated sucessfully' , $book->load('authors'));
     }
 
     /**
@@ -70,6 +84,7 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
-        //
+        //delete image        
+        //delete record        
     }
 }

@@ -105,7 +105,7 @@ Route::get('collect', function () {
 
 Route::get("m-m/{id}",function($id){
   $book= Book::find($id);
-  return $book->author;
+  return $book->authors;
 
 });
 Route::get("m-m-2/{id}",function($id){
