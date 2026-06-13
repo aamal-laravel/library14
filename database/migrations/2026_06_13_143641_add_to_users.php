@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('author_book', function (Blueprint $table) {           
-           $table->foreignId('book_id')->constrained()->onDelete('cascade'); 
-           $table->foreignId("author_id")->constrained()->onDelete('cascade');
-           $table->primary(['book_id',"author_id"]);
+        Schema::table('users', function (Blueprint $table) {
+            $table->enum('type' , ['admin' , 'librarian' ,'customer'])
+            ->after('remember_token')->default('customer');
         });
     }
 
@@ -23,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('author_book');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('user-type');
+        });
     }
 };

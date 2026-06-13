@@ -12,14 +12,20 @@ Route::get('/user', function (Request $request) {
 
 Route::get('categories', [CategoryController::class, "index"]);
 Route::get('category/{category}', [CategoryController::class, "show"]);
-Route::post('categories', [CategoryController::class, "store"]);
-Route::put('categories/{category}', [CategoryController::class, "update"]);
-Route::delete('categories/{category}', [CategoryController::class, "destroy"]);
+Route::apiResource('books', BookController::class)->only('index' ,'show');
 
-Route::apiResource('books', BookController::class);
+Route::middleware(['auth:sanctum' ,'user-type:admin'])->group(function(){    
+    Route::post('categories', [CategoryController::class, "store"]);
+    Route::put('categories/{category}', [CategoryController::class, "update"]);
+    Route::delete('categories/{category}', [CategoryController::class, "destroy"]);
+    
+    Route::apiResource('books', BookController::class)->except('index' ,'show');
+});
+
 
 Route::controller(ِِAuthController::class)->group(function () {
     Route::post('register',  'register');
     Route::post('login',  'login');
     Route::post('logout',  'logout')->middleware('auth:sanctum');;
 });
+
