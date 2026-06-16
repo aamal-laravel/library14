@@ -14,7 +14,7 @@ class AuthorResource extends JsonResource
             'full_name'  => $this->first_name . ' ' . $this->last_name,
             'email'      => $this->email,
             // 'birth_date' => $this->{'birth-date'}, 
-            'birth_date' => $this->{'birth_date'}, // لأن الاسم فيه -
+            'birth_date' => $this->{'birth_date'}, 
             'bio'        => $this->bio,
         ];
     }

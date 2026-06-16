@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BookRequest;
 use App\Http\Resources\BookResource;
 use App\Models\Book;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
@@ -29,19 +30,24 @@ class BookController extends Controller
     {
         //    return $request->all()ook;
         $data = $request->validated();
+
         if ($request->hasFile('cover')) {
             $filename = "$request->ISBN." .  $request->file('cover')->extension();
             $request->file('cover')->storeAs('book-images', $filename);
             $data['cover'] = $filename;
         }
 
-        $book = Book::create(
-            $data
-        );
+        $book = DB::transaction(function () use ($data) {
 
-        if ($request->has('authors')) {
-            $book->authors()->attach($request->authors);
-        }
+            $book = Book::create($data);
+
+            if (!empty($data['authors'] ?? null)) {
+                $book->authors()->attach($data['authors']);
+            }
+
+            return $book;
+        });
+
         return apiSuccess(data: $book, code: 201);
     }
 
@@ -70,13 +76,15 @@ class BookController extends Controller
             $request->file('cover')->storeAs('book-images', $filename);
             $data['cover'] = $filename;
         }
-        $book->update($data);
-        if ($request->has('authors')){
-            // $book->authors()->detach($book->authors);
-            // $book->authors()->attach($request->authors);
-            $book->authors()->sync($request->authors);
-        }
-        return apiSuccess('book updated sucessfully' , $book->load('authors'));
+        $book = DB::transaction(function () use ($data , $book) {
+          
+            if (! empty($data['authors'] ?? null) ){
+                // $book->authors()->detach($book->authors);
+                // $book->authors()->attach($request->authors);
+                $book->authors()->sync($data['authors']);
+            }
+        });
+        return apiSuccess('book updated sucessfully', $book->load('authors'));
     }
 
     /**
@@ -84,7 +92,12 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
-        //delete image        
-        //delete record        
+        if ($book->cover) {
+            Storage::delete($book->cover);
+        }
+
+        $book->delete();
+
+        return apiSuccess('Book deleted successfully');
     }
 }
