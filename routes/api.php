@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
@@ -14,6 +15,7 @@ Route::get('/user', function (Request $request) {
 Route::get('categories', [CategoryController::class, 'index']);
 Route::get('category/{category}', [CategoryController::class, 'show']);
 Route::apiResource('books', BookController::class)->only('index', 'show');
+Route::apiResource('authors', AuthorController::class)->only('index', 'show');
 
 
 Route::middleware(['auth:sanctum', 'user-type:admin'])->group(function () {
@@ -22,7 +24,7 @@ Route::middleware(['auth:sanctum', 'user-type:admin'])->group(function () {
     Route::delete('categories/{category}', [CategoryController::class, 'destroy']);
 
     Route::apiResource('books', BookController::class)->except('index', 'show');
-
+    Route::apiResource('authors', AuthorController::class)->except('index', 'show');
 });
 
 Route::middleware(['auth:sanctum', 'user-type:customer'])->group(function () {

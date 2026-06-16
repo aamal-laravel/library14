@@ -3,64 +3,57 @@
 namespace App\Http\Controllers;
 
 use App\Models\Author;
-use App\Http\Requests\StoreAuthorRequest;
-use App\Http\Requests\UpdateAuthorRequest;
+use App\Http\Requests\AuthorRequest;
+use App\Http\Resources\AuthorResource;
+use Illuminate\Http\JsonResponse;
 
 class AuthorController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $authors = Author::latest()->paginate(10);
+
+        return apiSuccess(
+            "تم جلب المؤلفين بنجاح",
+            AuthorResource::collection($authors)
+        );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(AuthorRequest $request): JsonResponse
     {
-        //
+        $author = Author::create($request->validated());
+
+        return apiSuccess(
+            "تم إنشاء المؤلف بنجاح",
+            new AuthorResource($author),
+            201
+        );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreAuthorRequest $request)
+    public function show(Author $author): JsonResponse
     {
-        //
+        return apiSuccess(
+            "تم جلب بيانات المؤلف بنجاح",
+            new AuthorResource($author)
+        );
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Author $author)
+    public function update(AuthorRequest $request, Author $author): JsonResponse
     {
-        //
+        $author->update($request->validated());
+
+        return apiSuccess(
+            "تم تحديث بيانات المؤلف بنجاح",
+            new AuthorResource($author)
+        );
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Author $author)
+    public function destroy(Author $author): JsonResponse
     {
-        //
-    }
+        $author->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateAuthorRequest $request, Author $author)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Author $author)
-    {
-        //
+        return apiSuccess(
+            "تم حذف المؤلف بنجاح"
+        );
     }
 }
