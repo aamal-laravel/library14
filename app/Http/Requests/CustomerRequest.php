@@ -4,15 +4,16 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
-class UpdateAuthorRequest extends FormRequest
+class CustomerRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return (bool) Auth::user()?->customer;
     }
 
     /**
@@ -22,8 +23,15 @@ class UpdateAuthorRequest extends FormRequest
      */
     public function rules(): array
     {
+        $customer = Auth::user()->customer;
+
         return [
-            //
+            'gender' => 'nullable|in:M,F',
+            'DOB' => 'nullable|date',
+            'phone' => 'required|string|unique:customers,phone,'.$customer?->id,
+            'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'lang' => 'nullable|in:ar,en',
         ];
+
     }
 }
