@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Book extends Model
 {
@@ -22,5 +23,10 @@ class Book extends Model
     }
     function authors():BelongsToMany{
         return $this->belongsToMany(Author::class);
+    }
+
+     public function removeStock():HasMany
+    {
+       return $this->hasMany(book_stock_operation::class, "book_id");
     }
 }

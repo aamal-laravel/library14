@@ -5,6 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BookRequest;
 use App\Http\Resources\BookResource;
 use App\Models\Book;
+<<<<<<< Updated upstream
+=======
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+>>>>>>> Stashed changes
 use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
@@ -70,6 +76,7 @@ class BookController extends Controller
             $request->file('cover')->storeAs('book-images', $filename);
             $data['cover'] = $filename;
         }
+<<<<<<< Updated upstream
         $book->update($data);
         if ($request->has('authors')){
             // $book->authors()->detach($book->authors);
@@ -77,6 +84,15 @@ class BookController extends Controller
             $book->authors()->sync($request->authors);
         }
         return apiSuccess('book updated sucessfully' , $book->load('authors'));
+=======
+        $book = DB::transaction(function () use ($data , $book) {
+          
+            if (! empty($data['authors'] ?? null) ){
+                $book->authors()->sync($data['authors']);
+            }
+        });
+        return apiSuccess('book updated sucessfully', $book->load('authors'));
+>>>>>>> Stashed changes
     }
 
     /**
@@ -87,4 +103,43 @@ class BookController extends Controller
         //delete image        
         //delete record        
     }
+
+
+public function SearchBook(Request $request)
+{
+    $books = Book::with(['authors', 'category'])
+
+        ->when($request->title, function ($q) use ($request) {
+            $q->where('title', 'LIKE', "%{$request->title}%");
+        })
+
+        ->when($request->author, function ($q) use ($request) {
+            $q->whereHas('authors', function ($author) use ($request) {
+                $author->where('first_name', 'LIKE', "%{$request->author}%");
+            });
+        })
+
+        ->when($request->category, function ($q) use ($request) {
+            $q->whereHas('category', function ($category) use ($request) {
+                $category->where('name', 'LIKE', "%{$request->category}%");
+            });
+        })
+
+        ->when($request->from_date, function ($q) use ($request) {
+            $q->whereDate('created_at', '>=', $request->from_date);
+        })
+
+        ->when($request->to_date, function ($q) use ($request) {
+            $q->whereDate('created_at', '<=', $request->to_date);
+        })
+
+        ->paginate(10);
+
+    return apiSuccess(
+        'تم جلب الكتب بنجاح',
+        BookResource::collection($books),
+        200
+    );
+}
+
 }
