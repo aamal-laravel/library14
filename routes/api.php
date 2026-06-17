@@ -7,6 +7,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ِِAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CartController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -38,4 +39,8 @@ Route::controller(ِِAuthController::class)->group(function () {
     Route::post('verify-otp', 'verifyOtp');
     Route::post('resend-otp', 'resendOtp');
     Route::post('logout', 'logout')->middleware('auth:sanctum');
+});
+
+ Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/cart/items', [CartController::class, 'addItem']);
 });
