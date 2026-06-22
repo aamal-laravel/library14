@@ -18,7 +18,7 @@ Route::apiResource('books', BookController::class)->only('index', 'show');
 Route::apiResource('authors', AuthorController::class)->only('index', 'show');
 
 
-Route::middleware(['auth:sanctum', 'user-type:admin'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::post('categories', [CategoryController::class, 'store']);
     Route::put('categories/{category}', [CategoryController::class, 'update']);
     Route::delete('categories/{category}', [CategoryController::class, 'destroy']);
@@ -27,7 +27,7 @@ Route::middleware(['auth:sanctum', 'user-type:admin'])->group(function () {
     Route::apiResource('authors', AuthorController::class)->except('index', 'show');
 });
 
-Route::middleware(['auth:sanctum', 'user-type:customer'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:customer'])->group(function () {
     Route::put('customer/profile',     [CustomerController::class, 'update']);
     Route::get('customer/profile',     [CustomerController::class, 'show']);
 });

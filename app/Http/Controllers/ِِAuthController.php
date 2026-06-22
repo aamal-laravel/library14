@@ -28,14 +28,15 @@ class ِِAuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if ($user) { //حساب موجود لكن غير مفعل، الحسابات المفعلى تم استبعادها في validation
+            $this->otpService->createOtp($user);
             return apiSuccess("الحساب موجود مسبقاً وتم إرسال رمز تفعيل جديد");
         }
 
         $avatarPath = null;
 
-        if ($request->hasFile('avatar')) 
+        if ($request->hasFile('avatar'))
             $avatarPath = Storage::putFile('customer_images', $request->file('avatar'));
-        
+
 
         try {
             $user = DB::transaction(function () use ($request, $avatarPath) {
@@ -47,7 +48,7 @@ class ِِAuthController extends Controller
                 $user->customer()->create($customerData);
 
                 return $user;
-            });            
+            });
         } catch (\Throwable $e) {
             //محي الملف في حال حدث خطأ خلال التخزين
             if ($avatarPath) {
