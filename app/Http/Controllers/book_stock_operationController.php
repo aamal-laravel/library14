@@ -6,6 +6,7 @@ use App\Models\Book;
 use App\Models\book_stock_operation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class book_stock_operationController extends Controller
 {
@@ -15,8 +16,8 @@ class book_stock_operationController extends Controller
     }
 public function store(Request $request)
 {
+    Gate::authorize('create',book_stock_operation::class);
     $data = $request->all();
-
     $book = Book::findOrFail($data['book_id']);
 
     if (
@@ -48,6 +49,12 @@ public function store(Request $request)
         null,
         201
     );
+}
+
+
+function theOperationAdd (){
+$author=book_stock_operation::all()->where('type',"LIKE","add")->sum('quantity');
+return $author;
 }
 
 }

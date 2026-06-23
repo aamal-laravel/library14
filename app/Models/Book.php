@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,4 +30,27 @@ class Book extends Model
     {
        return $this->hasMany(book_stock_operation::class, "book_id");
     }
+
+    public function scopeFilter(Builder $query, array $filters)
+{
+    return $query->when($filters['title'] ?? null, function ($q, $title) {
+            $q->where('title', 'LIKE', "%{$title}%");
+        })
+        ->when($filters['author'] ?? null, function ($q, $author) {
+            $q->whereHas('authors', function ($authorQuery) use ($author) {
+                $authorQuery->where('first_name', 'LIKE', "%{$author}%");
+            });
+        })
+        ->when($filters['category'] ?? null, function ($q, $category) {
+            $q->whereHas('category', function ($categoryQuery) use ($category) {
+                $categoryQuery->where('name', 'LIKE', "%{$category}%");
+            });
+        })
+        ->when($filters['from_date'] ?? null, function ($q, $fromDate) {
+            $q->whereDate('created_at', '>=', $fromDate);
+        })
+        ->when($filters['to_date'] ?? null, function ($q, $toDate) {
+            $q->whereDate('created_at', '<=', $toDate);
+        });
+}
 }

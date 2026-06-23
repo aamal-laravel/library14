@@ -48,10 +48,22 @@ class CategoryController extends Controller
     }
 
     function destroy(Category $category):JsonResponse{
-        // $category = Category::findOrFail($id);
+       
         if ( $category->books()->count())
             return apiFail("لا يمكن محي صنف يتضمن كتب");
         $category->delete();
        return apiSuccess("  تم حذف السجل بنجاح " );
     }
+
+  public function HasBook(){
+    $category=Category::has('books','>',0)->get();  
+     return $category;
+}    
+
+   public function CategoryCount(){
+          $category=Category::all()->count();
+         return $category;
+        }
+
+
 }

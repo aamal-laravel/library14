@@ -2,65 +2,67 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AuthorRequest;
 use App\Models\Author;
-use App\Http\Requests\StoreAuthorRequest;
-use App\Http\Requests\UpdateAuthorRequest;
+use App\Models\Category;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+
 
 class AuthorController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+   
+    public function index():JsonResponse
     {
-        //
+        return apiSuccess("All Author",Author::all(),200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+   
+    public function store(AuthorRequest $request):JsonResponse
     {
-        //
+      $data=$request->validated();
+      $author=Author::create($data);
+      return apiSuccess("Author Created",$author,201);  
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreAuthorRequest $request)
+    public function show(Author $author):JsonResponse
     {
-        //
+     return apiSuccess("Author get",$author,200);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Author $author)
+    public function update(AuthorRequest $request,Author $author):JsonResponse
     {
-        //
+       $data=$request->validated();
+       $author->update($data);
+       return apiSuccess("Author Updated",$author,200);   
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Author $author)
+   
+    public function destroy(Author $author):JsonResponse
     {
-        //
+        $author->delete();
+         return apiSuccess("Author Deleted",200);     
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateAuthorRequest $request, Author $author)
-    {
-        //
+
+    public function AuthorCount(){
+        $author = Author::count();
+        return $author;
+    }
+    public function HasNoBook(){
+    $author=Author::has('books',"=",0)->count();
+    return $author;
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Author $author)
-    {
-        //
+    public function DeleteManyAuthor(Request $request): JsonResponse {
+        $ids=$request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:authors,id'
+        ]);  
+        
+        Author::whereIn('id', $ids)->delete();
+        
+        return apiSuccess("تم الحذف بنجاح", code: 200); 
     }
+   
 }

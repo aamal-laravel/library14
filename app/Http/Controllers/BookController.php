@@ -5,35 +5,26 @@ namespace App\Http\Controllers;
 use App\Http\Requests\BookRequest;
 use App\Http\Resources\BookResource;
 use App\Models\Book;
-<<<<<<< Updated upstream
-=======
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
->>>>>>> Stashed changes
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+   
     public function index()
     {
         $books = Book::with('category',  'authors')->get();
-        // return $books;  
+         
         $books = BookResource::collection($books);
         return apiSuccess("All books", $books);
     }
 
-
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(BookRequest $request)
     {
-        //    return $request->all()ook;
         $data = $request->validated();
         if ($request->hasFile('cover')) {
             $filename = "$request->ISBN." .  $request->file('cover')->extension();
@@ -62,10 +53,6 @@ class BookController extends Controller
     }
 
 
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(BookRequest $request, Book $book)
     {
         $data = $request->validated();
@@ -76,15 +63,6 @@ class BookController extends Controller
             $request->file('cover')->storeAs('book-images', $filename);
             $data['cover'] = $filename;
         }
-<<<<<<< Updated upstream
-        $book->update($data);
-        if ($request->has('authors')){
-            // $book->authors()->detach($book->authors);
-            // $book->authors()->attach($request->authors);
-            $book->authors()->sync($request->authors);
-        }
-        return apiSuccess('book updated sucessfully' , $book->load('authors'));
-=======
         $book = DB::transaction(function () use ($data , $book) {
           
             if (! empty($data['authors'] ?? null) ){
@@ -92,47 +70,26 @@ class BookController extends Controller
             }
         });
         return apiSuccess('book updated sucessfully', $book->load('authors'));
->>>>>>> Stashed changes
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Book $book)
     {
-        //delete image        
-        //delete record        
+          Gate::authorize('delete',$book);
+            if ($book->cover) {
+                Storage::delete("book_image/" . $book->cover);
+            }
+            $book->delete();
+        return apiSuccess("the book is deleted");
     }
 
 
 public function SearchBook(Request $request)
 {
+    
+    $filters = $request->only(['title', 'author', 'category', 'from_date', 'to_date']);
+
     $books = Book::with(['authors', 'category'])
-
-        ->when($request->title, function ($q) use ($request) {
-            $q->where('title', 'LIKE', "%{$request->title}%");
-        })
-
-        ->when($request->author, function ($q) use ($request) {
-            $q->whereHas('authors', function ($author) use ($request) {
-                $author->where('first_name', 'LIKE', "%{$request->author}%");
-            });
-        })
-
-        ->when($request->category, function ($q) use ($request) {
-            $q->whereHas('category', function ($category) use ($request) {
-                $category->where('name', 'LIKE', "%{$request->category}%");
-            });
-        })
-
-        ->when($request->from_date, function ($q) use ($request) {
-            $q->whereDate('created_at', '>=', $request->from_date);
-        })
-
-        ->when($request->to_date, function ($q) use ($request) {
-            $q->whereDate('created_at', '<=', $request->to_date);
-        })
-
+        ->filter($filters) 
         ->paginate(10);
 
     return apiSuccess(
@@ -140,6 +97,34 @@ public function SearchBook(Request $request)
         BookResource::collection($books),
         200
     );
+}
+
+
+   public function bookCount (){
+        $books=Book::all()->count();
+        return $books;
+    }
+
+    public function trendBook (){
+     $books=Book::with('category')->take(6)->get();
+     return $books;
+}
+
+
+public function DeleteManyBook (Request $request) {
+    $request->validate([
+        'ids' => 'required|array',
+        'ids.*' => 'exists:authors,id'
+    ]);
+    $ids = $request->input('ids'); 
+    $books=Book::whereIn('id',$ids)->get();
+    foreach($books as $book){
+        if(Auth::user()->cannot('delete',$book)){
+            return apiFail("You UnAuthorized to Delete this book",code:403);
+        }
+    }
+    Book::whereIn('id', $ids)->delete();
+    return apiSuccess("تم الحذف بنجاح", code: 200); 
 }
 
 }
