@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\WaitingList;
+
 
 class Book extends Model
 {
@@ -23,4 +26,16 @@ class Book extends Model
     function authors():BelongsToMany{
         return $this->belongsToMany(Author::class);
     }
+    public function billItems(): HasMany
+{
+    return $this->hasMany(BillItem::class);
+}
+public function WaitingList()
+{
+    return $this->hasMany(waitingList::class);
+}
+public function scopeAvailable($query)
+{
+    return $query->where('stock', '>', 0);
+}
 }
