@@ -7,6 +7,10 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ِِAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\CheckoutController;
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -30,6 +34,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 Route::middleware(['auth:sanctum', 'role:customer'])->group(function () {
     Route::put('customer/profile',     [CustomerController::class, 'update']);
     Route::get('customer/profile',     [CustomerController::class, 'show']);
+    Route::post('checkout',[CheckoutController::class, 'store']);//from masa
 });
 
 Route::controller(ِِAuthController::class)->group(function () {
@@ -39,3 +44,23 @@ Route::controller(ِِAuthController::class)->group(function () {
     Route::post('resend-otp', 'resendOtp');
     Route::post('logout', 'logout')->middleware('auth:sanctum');
 });
+//get , update settings
+Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    Route::get('settings', [SettingController::class, 'index']);
+    Route::put('settings', [SettingController::class, 'update']);
+});
+ //pay initial for testingg
+ Route::middleware(['auth:sanctum'])
+    ->group(function () {
+
+        Route::post(
+            'payments',
+            [PaymentController::class, 'store']
+        );
+
+        Route::get(
+            'payments/{payment}',
+            [PaymentController::class, 'show']
+        );
+    });
+    

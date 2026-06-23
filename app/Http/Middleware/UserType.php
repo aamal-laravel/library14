@@ -16,7 +16,7 @@ class UserType
     public function handle(Request $request, Closure $next , $type): Response
     {
         if ($request->user()->type != $type)
-            return abort('403');
+            return abort(403);
         return $next($request);
     }
 }
