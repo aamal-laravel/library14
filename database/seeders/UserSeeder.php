@@ -14,8 +14,8 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         
-        $admin = ['name' => 'admin-test' ,'email' => 'admin@test.com' ,  'password' =>123 , 'type' => 'admin'];
-        $custmer = ['name' => 'custmer-test' ,'email' => 'customer@test.com' ,  'password' =>123 ];
+        $admin = ['name' => 'admin-test' ,'email' => 'admin@test.com' ,  'password' =>123 , 'email_verified_at' => now(), 'type' => 'admin'];
+        $custmer = ['name' => 'custmer-test' ,'email' => 'customer@test.com' ,  'password' =>123 , 'email_verified_at' => now(),];
         User::create($admin);
         User::create($custmer);
     }

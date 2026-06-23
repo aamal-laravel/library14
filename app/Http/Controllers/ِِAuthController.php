@@ -35,7 +35,7 @@ class ِِAuthController extends Controller
         $avatarPath = null;
 
         if ($request->hasFile('avatar'))
-            $avatarPath = Storage::putFile('customer_images', $request->file('avatar'));
+            $avatarPath = Storage::putFile('customer-avatars', $request->file('avatar'));
 
 
         try {

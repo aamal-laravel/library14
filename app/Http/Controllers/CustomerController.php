@@ -45,7 +45,7 @@ class CustomerController extends Controller
         }
 
         return apiSuccess(
-            'تم قراءة بينات الزبون',
+            'تم قراءة بيانات الزبون',
             new CustomerResource($customer)
         );
     }
