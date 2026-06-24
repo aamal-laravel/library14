@@ -32,6 +32,7 @@ class BookController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('cover')) {
+            // return $request->cover;
             $filename = "$request->ISBN." .  $request->file('cover')->extension();
             $request->file('cover')->storeAs('book-images', $filename);
             $data['cover'] = $filename;
@@ -92,9 +93,7 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
-        if ($book->cover) {
-            Storage::delete($book->cover);
-        }
+       
 
         $book->delete();
 
