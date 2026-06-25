@@ -7,14 +7,15 @@ use App\Models\Author;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Cache;
 
 class AuthorController extends Controller
 {
    
     public function index():JsonResponse
     {
-        return apiSuccess("All Author",Author::all(),200);
+     $author=Cache::remember("authors",3600,fn()=>Author::all());
+        return apiSuccess("All Author", $author,200);
     }
 
    

@@ -8,19 +8,18 @@ use App\Models\Book;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
-   
+
     public function index()
     {
-        $books = Book::with('category',  'authors')->get();
-         
-        $books = BookResource::collection($books);
-        return apiSuccess("All books", $books);
+        $books = Cache::remember('books', 3600, fn() => Book::with('category',  'authors')->get());
+        return apiSuccess("All books", $books, 200);
     }
 
     public function store(BookRequest $request)
@@ -42,9 +41,6 @@ class BookController extends Controller
         return apiSuccess(data: $book, code: 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Book $book)
     {
         $book = $book->load('category', 'authors');
@@ -63,9 +59,9 @@ class BookController extends Controller
             $request->file('cover')->storeAs('book-images', $filename);
             $data['cover'] = $filename;
         }
-        $book = DB::transaction(function () use ($data , $book) {
-          
-            if (! empty($data['authors'] ?? null) ){
+        $book = DB::transaction(function () use ($data, $book) {
+
+            if (! empty($data['authors'] ?? null)) {
                 $book->authors()->sync($data['authors']);
             }
         });
@@ -74,57 +70,55 @@ class BookController extends Controller
 
     public function destroy(Book $book)
     {
-          Gate::authorize('delete',$book);
-            if ($book->cover) {
-                Storage::delete("book_image/" . $book->cover);
-            }
-            $book->delete();
+        Gate::authorize('delete', $book);
+        $book->delete();
         return apiSuccess("the book is deleted");
     }
 
 
-public function SearchBook(Request $request)
-{
-    
-    $filters = $request->only(['title', 'author', 'category', 'from_date', 'to_date']);
+    public function SearchBook(Request $request)
+    {
 
-    $books = Book::with(['authors', 'category'])
-        ->filter($filters) 
-        ->paginate(10);
+        $filters = $request->only(['title', 'author', 'category', 'from_date', 'to_date']);
 
-    return apiSuccess(
-        'تم جلب الكتب بنجاح',
-        BookResource::collection($books),
-        200
-    );
-}
+        $books = Book::with(['authors', 'category'])
+            ->filter($filters)
+            ->paginate(10);
 
-
-   public function bookCount (){
-        $books=Book::all()->count();
-        return $books;
+        return apiSuccess(
+            'تم جلب الكتب بنجاح',
+            BookResource::collection($books),
+            200
+        );
     }
 
-    public function trendBook (){
-     $books=Book::with('category')->take(6)->get();
-     return $books;
-}
+    public function bookCount()
+    {
+        return Cache::remember('bookCount', 3600, fn() => Book::all()->count());
+    }
+
+    public function trendBook()
+    {
+        return Cache::remember('trendBook', 3600, fn() => Book::with('category')->take(6)->get());
+    }
 
 
-public function DeleteManyBook (Request $request) {
-    $request->validate([
-        'ids' => 'required|array',
-        'ids.*' => 'exists:authors,id'
-    ]);
-    $ids = $request->input('ids'); 
-    $books=Book::whereIn('id',$ids)->get();
-    foreach($books as $book){
-        if(Auth::user()->cannot('delete',$book)){
-            return apiFail("You UnAuthorized to Delete this book",code:403);
+
+
+    public function DeleteManyBook(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:authors,id'
+        ]);
+        $ids = $request->input('ids');
+        $books = Book::whereIn('id', $ids)->get();
+        foreach ($books as $book) {
+            if (Auth::user()->cannot('delete', $book)) {
+                return apiFail("You UnAuthorized to Delete this book", code: 403);
+            }
         }
+        Book::whereIn('id', $ids)->delete();
+        return apiSuccess("تم الحذف بنجاح", code: 200);
     }
-    Book::whereIn('id', $ids)->delete();
-    return apiSuccess("تم الحذف بنجاح", code: 200); 
-}
-
 }
