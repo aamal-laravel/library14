@@ -18,7 +18,7 @@ class BookController extends Controller
         $books = Book::with('category',  'authors')->get();
         // return $books;  
         $books = BookResource::collection($books);
-        return apiSuccess("All books", $books);
+        return apiSuccess( data: $books);
     }
 
 

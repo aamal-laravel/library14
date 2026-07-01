@@ -111,5 +111,11 @@ Route::get("m-m/{id}",function($id){
 Route::get("m-m-2/{id}",function($id){
   $author= Author::find($id);
   return $author->books;
-
 });
+/** lang */
+Route::get("lang",function(){
+  app()->setlocale('ar');
+//   return __('library.success');
+  return apiSuccess();
+});
+

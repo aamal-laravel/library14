@@ -3,9 +3,13 @@
 use App\Helpers\ResponseHelper;
 use Illuminate\Http\JsonResponse;
 
-function apiSuccess(string $message = "تمت العملية بنجاح", mixed $data = null, int $code = 200) : JsonResponse {
-    return ResponseHelper::success($message , $data, $code);
+function apiSuccess(string $message = null, mixed $data = null, int $code = 200): JsonResponse
+{
+    $message =   $message ?? __('library.success');
+    return ResponseHelper::success($message, $data, $code);
 }
-function apiFail(string $message = "فشلت العملية", mixed $data = null, int $code = 400) : JsonResponse {
-    return ResponseHelper::fail($message , $data, $code);
+function apiFail(string $message =null, mixed $data = null, int $code = 400): JsonResponse
+{
+    $message =   $message ?? __('library.failed');
+    return ResponseHelper::fail($message, $data, $code);
 }
